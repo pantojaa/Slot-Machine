@@ -13,6 +13,8 @@
 void LCD_init(void);
 void commandWrite(uint8_t command);
 void dataWrite(uint8_t data);
+void string_decoder(uint8_t* s);
+void send_string(uint8_t *s);
 void clear_display(void);
 void send_cursor_HOME(void);
 void setBlinkerOFF(void);
