@@ -128,6 +128,35 @@ void dataWrite(uint8_t data)
     delay_us(100);
 }
 /* ----------------------------------------------------------
+ * Function: Sends string values to string_decoder function 
+ *    Input: Individual values of any string 
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void send_string(uint8_t *s)
+{
+    string_decoder(s);
+}
+/* ----------------------------------------------------------
+ * Function: Sends string values to dataWrite function to print
+ *           values on LCD
+ *    Input: Individual values of any string 
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void string_decoder(uint8_t* s)
+{
+    //string is passed
+    uint8_t* c;
+
+    c = s;
+    //until EOF, send string elements to LCD_data
+    while (*c != 0)
+    {
+        data_Write(*c);
+        c++;
+    }
+}
+
+/* ----------------------------------------------------------
  * Function: Will clear the display of the LCD
  *    Input: N/A
  *   Output: N/A
@@ -188,7 +217,7 @@ void setBlinkerLine2(int space)
 }
 /* ----------------------------------------------------------
  * Function: Will send the cursor to a specified position on
- *           the third line
+ *           the third row
  *    Input: space the blinker should go to [0 < space < 15]
  *   Output: N/A
  * ---------------------------------------------------------- */
