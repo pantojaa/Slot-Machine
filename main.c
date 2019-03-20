@@ -1,237 +1,163 @@
-/*
- * LCD_Display_code.c
- *
- *  Created on: March 17, 2019
- *      Author: Adan
- */
-#include "SysTick.h"
+/* ----- Libraries ----- */
 #include "msp.h"
+#include "LCD_Display.h"
+#include "SysTick.h"
+#include "ADC_init.h"
+#include <stdint.h>
+#include <stdio.h>
 
-/* ----- Definitions ----- */
-#define LCD_PORT P4
-#define DB7 BIT7
-#define DB6 BIT6
-#define DB5 BIT5
-#define DB4 BIT4
-#define RW  BIT2
-#define RS  BIT1
-#define E   BIT0
-
-
-/* ----- Functions ----- */
-
+/* ----- Function Prototypes ----- */
+void introMessage(void);
+void mainMenu(void);
+void soundOption(void);
+void enterCreditOption(void);
+void cashOut(void);
+void game_screen(void);
+/* ------ Public Functions ----- */
 /* ----------------------------------------------------------
- * Function: Sets up ports and pins to allow interface with LCD
+ * Function: Displays: "Adan P. Austin J. Slot Machine" on LCD
  *    Input: N/A
  *   Output: N/A
  * ---------------------------------------------------------- */
-void GPIO_init(void)
+void introMessage(void)
 {
-    LCD_PORT->SEL0 &= ~(0xFF); // Set all pins to general purpose i/o
-    LCD_PORT->SEL1 &= ~(0xFF); // Set all pins to general purpose i/o
-    LCD_PORT->DIR  |=   0xFF;  // Set all pins as outputs
-    LCD_PORT->OUT  &= ~(0xFF); // Set all pins to LOW
+    setBlinkerLine1(4);
+    send_string("Adan");
+
+    setBlinkerLine2(4);
+    send_string("Austin");
+
+    setBlinkerLine4(2);
+    send_string("Slot ");
+    send_string("Machine "); 
 }
 /* ----------------------------------------------------------
- * Function: Sets up LCD by writing a sequence of commands
+ * Function: Displays: "1- Sound  2- Enter Credits  3- Play" on LCD
  *    Input: N/A
  *   Output: N/A
  * ---------------------------------------------------------- */
-void LCD_init(void)
+void mainMenu(void)
 {
-    GPIO_init(); // Sets up pins to allow them to interface with LCD
+    setBlinkerLine1(0);
+    send_string("1 - Sounds "); 
+    
+    setBlinkerLine2(0);
+    send_string("Enter Credits");
 
-    commandWrite(3);
-    delay_ms(100);
-    commandWrite(3);
-    delay_us(100);
-    commandWrite(3);
-    delay_ms(100);
-
-    commandWrite(2);
-    delay_us(100);
-    commandWrite(2);
-    delay_us(100);
-
-    commandWrite(8);
-    delay_us(100);
-    commandWrite(0x0F);
-    delay_us(100);
-    commandWrite(1);
-    delay_us(100);
-    commandWrite(6);
-    delay_ms(10);
+    setBlinkerLine3(0);
+    send_string("Play");
 }
 /* ----------------------------------------------------------
- * Function: Pulses the enable pin to allow communication
- *           between the MSP and the LCD
+ * Function: Displays: "1- Chirp  2- Siren  3- Beep" on LCD
  *    Input: N/A
  *   Output: N/A
  * ---------------------------------------------------------- */
-void PulseEnablePin(void)
+void soundOption(void)
 {
-    LCD_PORT->OUT &= ~(E);
-    delay_us(10);
-    LCD_PORT->OUT |=   E;
-    delay_us(10);
-    LCD_PORT->OUT &= ~(E);
-    delay_us(10);
-}
-/* ----------------------------------------------------------
- * Function: Pushes a nibble of data into the D4-D7 bits of
- *           the LCD
- *    Input: Nibble of data that you want written to the LCD
- *   Output: N/A
- * ---------------------------------------------------------- */
-void pushNibble(uint8_t nibble)
-{
-    LCD_PORT->OUT &= ~(0xF0); // Clears all P4.7 - P4.4
-    LCD_PORT->OUT |= (nibble & 0x0F) << 4;
-    PulseEnablePin();
-}
-/* ----------------------------------------------------------
- * Function: Takes a byte of data a sends it to the MSP a nibble
- *           at a time
- *    Input: Byte of data that will be sent to LCD
- *   Output: N/A
- * ---------------------------------------------------------- */
-void pushByte(uint8_t byte)
-{
-    uint8_t nibble;
+    setBlinkerLine1(0);
+    send_string("1 - Chirp")
+    
+    setBlinkerLine2(0);
+    send_string("2- Beep"); 
 
-    nibble = (byte & 0xF0) >> 4;
-    pushNibble(nibble);
-    nibble = (byte & 0x0F);
-    pushNibble(nibble);
+    setBlinkerLine3(0);
+    send_string("3 - Siren"); 
 }
 /* ----------------------------------------------------------
- * Function: Accepts a command that will be sent to the LCD
- *    Input: Hex representation of that command
+ * Function: Displays: "Enter Credits" on LCD
+ *    Input: N/A
  *   Output: N/A
  * ---------------------------------------------------------- */
-void commandWrite(uint8_t command)
+void enterCreditOption(void)
 {
-    LCD_PORT->OUT &= ~RS;
-    pushByte(command);
-    delay_us(100);
-}
-/* ----------------------------------------------------------
- * Function: Accepts piece of data that will be displayed on
- *           the LCD
- *    Input: Byte sized data that will be sent to the LCD
- *   Output: N/A
- * ---------------------------------------------------------- */
-void dataWrite(uint8_t data)
-{
-    LCD_PORT->OUT |= RS;
-    pushByte(data);
-    delay_us(100);
-}
-/* ----------------------------------------------------------
- * Function: Sends string values to string_decoder function 
- *    Input: Individual values of any string 
- *   Output: N/A
- * ---------------------------------------------------------- */
-void send_string(uint8_t *s)
-{
-    string_decoder(s);
-}
-/* ----------------------------------------------------------
- * Function: Sends string values to dataWrite function to print
- *           values on LCD
- *    Input: Individual values of any string 
- *   Output: N/A
- * ---------------------------------------------------------- */
-void string_decoder(uint8_t* s)
-{
-    //string is passed
-    uint8_t* c;
+    setBlinkerLine1(0);
+    send_string("Enter Credits");
+    setBlinkerLine2(0);
+    send_string("* = Cancel");
 
-    c = s;
-    //until EOF, send string elements to LCD_data
-    while (*c != 0)
+    setBlinkerLine3(0);
+    send_string("# = Accept");
+}
+/* ----------------------------------------------------------
+ * Function: Displays the message for cashout
+ *    Input: N/A
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void cashOut(void)
+{
+    setBlinkerLine1(0);
+    send_string("Cash Out:")
+
+    setBlinkerLine3(0);
+    send_string("Thanks 4 Playing");
+    setBlinkerLine4(2);
+    send_string("Slot Machine");
+/* ----------------------------------------------------------
+ * Function: Displays the message for when user has won
+ *    Input: N/A
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void game_screen(void)
+{
+    setBlinkerLine1(11);
+    send_string("WIN!")
+
+    setBlinkerLine3(0);
+    send_string("CR");
+
+    setBlinkerLine3(7);
+    send_string("Menu");
+    setBlinkerLine3(13);
+    send_string("Bet");
+}
+void main(void)
+{
+    uint8_t current = 1;
+    // ----- Stop Watchdog Timer -----
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;
+
+    // ----- Initializing Peripherals -----
+    SysTick_init_NoInt();
+    LCD_init();
+    ADC_init();
+    /* ----- Local Variables ----- */
+    uint8_t userChoiceMM = 9; // Stores what option the user picks in the main menu
+
+    setBlinkerOFF();
+    introMessage();
+    delay_ms(3000);
+    while(1)
     {
-        data_Write(*c);
-        c++;
-    }
-}
 
-/* ----------------------------------------------------------
- * Function: Will clear the display of the LCD
- *    Input: N/A
- *   Output: N/A
- * ---------------------------------------------------------- */
-void clear_display(void)
-{
-    commandWrite(0x01);
-    delay_ms(10);
-}
-/* ----------------------------------------------------------
- * Function: Will send the cursor to the home position on the
- *           LCD
- *    Input: N/A
- *   Output: N/A
- * ---------------------------------------------------------- */
-void send_cursor_HOME(void)
-{
-    commandWrite(0x02);
-    delay_ms(10);
-}
-/* ----------------------------------------------------------
- * Function: Will disable the cursor from blinking
- *    Input: N/A
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerOFF(void)
-{
-    commandWrite(0x0C);
-}
-/* ----------------------------------------------------------
- * Function: Will enable the cursor to start blinking
- *    Input: N/A
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerON(void)
-{
-    commandWrite(0x0F);
-}
-/* ----------------------------------------------------------
- * Function: Will send the cursor to a specified position on
- *           the first row
- *    Input: space the blinker should go to [0 < space < 15]
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerLine1(int space)
-{
-    commandWrite(0x80 + space);
-}
-/* ----------------------------------------------------------
- * Function: Will send the cursor to a specified position on
- *           the second row
- *    Input: space the blinker should go to [0 < space < 15]
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerLine2(int space)
-{
-    commandWrite(0xC0 + space);
-}
-/* ----------------------------------------------------------
- * Function: Will send the cursor to a specified position on
- *           the third row
- *    Input: space the blinker should go to [0 < space < 15]
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerLine3(int space)
-{
-    commandWrite(0x90 + space);
-}
-/* ----------------------------------------------------------
- * Function: Will send the cursor to a specified position on
- *           the fourth row
- *    Input: space the blinker should go to [0 < space < 15]
- *   Output: N/A
- * ---------------------------------------------------------- */
-void setBlinkerLine4(int space)
-{
-    commandWrite(0xD0 + space);
+        switch(current)
+        {
+            case 1:
+                clear_display();
+                mainMenu();
+                while (userChoiceMM == 999)
+                {
+
+                }
+                break;
+            case 2:
+                clear_display();
+                soundOption();
+                break;
+            case 3:
+                clear_display();
+                enterCreditOption();
+                break;
+            case 4:
+                clear_display();
+                cashOut();
+                break;
+            case 5:
+                clear_display();
+                game_screen();
+                break;
+            default:
+                current = 1;
+                break;
+        }
+    }
 }
