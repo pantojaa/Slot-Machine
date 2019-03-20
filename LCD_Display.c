@@ -8,7 +8,7 @@
 #include "msp.h"
 
 /* ----- Definitions ----- */
-#define LCD_PORT P4
+#define LCD_PORT P2
 #define DB7 BIT7
 #define DB6 BIT6
 #define DB5 BIT5
