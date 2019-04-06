@@ -8,11 +8,11 @@
 #ifndef PUSHBUTTON_H_
 #define PUSHBUTTON_H_
 
-uint8_t IncreaseButtonIsPressed(void);
-uint8_t DecreasedButtonIsPressed(void);
-uint8_t SpinButtonIsPressed(void);
-uint8_t CashOutButtonIsPressed(void);
-void gpioInitial_PB();
+ void GPIO_Init_PB(void);
+ int PlayButtonIsPressed(void);
+ uint8_t Dec_Pressed(void);
+ uint8_t Inc_Pressed(void);
+ void setInter(void);
 
 
 #endif /* PUSHBUTTON_H_ */
