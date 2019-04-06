@@ -9,7 +9,7 @@
 #include "msp.h"
 
 /* ----- Definitions ----- */
-#define KEYPAD_PORT P4
+#define KEYPAD_PORT P2
 #define R0 BIT0
 #define R1 BIT1
 #define R2 BIT2
@@ -32,6 +32,8 @@
 #define POUND_KEY_VALUE 12
 
 
+int value = 0;
+
 /* ----------------------------------------------------------
  * Function: Sets up port and pins to interface with keypad
  *    Input: N/A
@@ -41,18 +43,18 @@ void Keypad_init(void)
 {
     KEYPAD_PORT->SEL0 &= ~0x00; // Sets all pins in KEYPAD_PORT to GPIO
     KEYPAD_PORT->SEL1 &= ~0x00; // Sets all pins in KEYPAD_PORT to GPIO
-    KEYPAD_PORT->DIR &= ~0x00; // Sets rows of the keypad as inputs
-    KEYPAD_PORT->REN |= (R0 | R1 | R2 | R3); // Enables pull resistors for the rows
-    KEYPAD_PORT->OUT |= (R0 | R1 | R2 | R3); // Sets the resistor as a pull-up resistor
+    KEYPAD_PORT->DIR  &= ~0x00; // Sets rows of the keypad as inputs
+    KEYPAD_PORT->REN  |= (R0 | R1 | R2 | R3); // Enables pull resistors for the rows
+    KEYPAD_PORT->OUT  |= (R0 | R1 | R2 | R3); // Sets the resistor as a pull-up resistor
 }
 /* ----------------------------------------------------------
- * Function: Will check to see if a button was pressed along with
- *           retrieving what number was pressed
- *    Input: Variable where the number pressed will be stored
+ * Function: Will check to see if a button was pressed
+ *    Input: N/A
  *   Output: if button is pressed return 1, else 0
  * ---------------------------------------------------------- */
-uint8_t Read_Keypad(uint8_t* value)
+uint8_t Read_Keypad(void)
 {
+    value = 0;
     int col, row;
     for(col = 0; col < 3; col++)
     {
@@ -80,24 +82,33 @@ uint8_t Read_Keypad(uint8_t* value)
     // If the first row (row0)is pressed
     if(row == 0x0E)
     {
-        *value = col + 1; // Obtains the value pressed using the column it read the press in
+        value = col + 1; // Obtains the value pressed using the column it read the press in
         // (i.e. if column 1 in row 0 was detected, then the value is equal to (value = 1 + 1 = 2)
     }
     // If the second row (row1)is pressed
     if(row == 0x0D)
     {
-        *value = 3 + col + 1;
+        value = 3 + col + 1;
     }
     // If the third row (row2)is pressed
     if(row == 0x0B)
     {
-        *value = 6 + col + 1;
+        value = 6 + col + 1;
     }
     // If the fourth row (row3)is pressed
     if(row == 0x07)
     {
-        *value = 9 + col + 1;
+        value = 9 + col + 1;
     }
 
     return 1; // A button was pressed
+}
+/* ----------------------------------------------------------
+ * Function: gets the value that was pressed on the keypad
+ *    Input: N/A
+ *   Output: value - key pressed by the user
+ * ---------------------------------------------------------- */
+int getKeyPressed(void)
+{
+    return value;
 }
