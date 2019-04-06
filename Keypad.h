@@ -11,7 +11,7 @@
 
 /* ----- Public Functions ----- */
 void Keypad_init(void);
-uint8_t Read_Keypad(uint8_t* value);
-
+uint8_t Read_Keypad(void);
+int getKeyPressed(void);
 
 #endif /* KEYPAD_H_ */
