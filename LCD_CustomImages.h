@@ -66,7 +66,7 @@ custom_char_t star_layout = {
     0b00000
 };
 
-// example custom character struct of a smile:
+// example custom character struct of a house:
 custom_char_t house_layout = {
     0b00000,
     0b00100,
