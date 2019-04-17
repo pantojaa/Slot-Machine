@@ -1,21 +1,15 @@
-/*
- * LCD_Display_code.c
- *
- *  Created on: March 17, 2019
- *      Author: Adan
- */
 #include "SysTick.h"
 #include "msp.h"
 
 /* ----- Definitions ----- */
-#define LCD_PORT P2
-#define DB7 BIT7
-#define DB6 BIT6
-#define DB5 BIT5
-#define DB4 BIT4
-#define RW  BIT2
-#define RS  BIT1
-#define E   BIT0
+#define LCD_PORT P4
+#define DB7      BIT7
+#define DB6      BIT6
+#define DB5      BIT5
+#define DB4      BIT4
+#define RW       BIT2
+#define RS       BIT1
+#define E        BIT0
 
 
 /* ----- Functions ----- */
@@ -128,35 +122,6 @@ void dataWrite(uint8_t data)
     delay_us(100);
 }
 /* ----------------------------------------------------------
- * Function: Sends string values to string_decoder function 
- *    Input: Individual values of any string 
- *   Output: N/A
- * ---------------------------------------------------------- */
-void send_string(uint8_t *s)
-{
-    string_decoder(s);
-}
-/* ----------------------------------------------------------
- * Function: Sends string values to dataWrite function to print
- *           values on LCD
- *    Input: Individual values of any string 
- *   Output: N/A
- * ---------------------------------------------------------- */
-void string_decoder(uint8_t* s)
-{
-    //string is passed
-    uint8_t* c;
-
-    c = s;
-    //until EOF, send string elements to LCD_data
-    while (*c != 0)
-    {
-        data_Write(*c);
-        c++;
-    }
-}
-
-/* ----------------------------------------------------------
  * Function: Will clear the display of the LCD
  *    Input: N/A
  *   Output: N/A
@@ -217,7 +182,7 @@ void setBlinkerLine2(int space)
 }
 /* ----------------------------------------------------------
  * Function: Will send the cursor to a specified position on
- *           the third row
+ *           the third line
  *    Input: space the blinker should go to [0 < space < 15]
  *   Output: N/A
  * ---------------------------------------------------------- */
@@ -235,3 +200,32 @@ void setBlinkerLine4(int space)
 {
     commandWrite(0xD0 + space);
 }
+/* ----------------------------------------------------------
+ * Function: Sends string values to string_decoder function
+ *    Input: Individual values of any string
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void send_string(uint8_t *s)
+{
+    string_decoder(s);
+}
+/* ----------------------------------------------------------
+ * Function: Sends string values to dataWrite function to print
+ *           values on LCD
+ *    Input: Individual values of any string
+ *   Output: N/A
+ * ---------------------------------------------------------- */
+void string_decoder(uint8_t* s)
+{
+    //string is passed
+    uint8_t* c;
+
+    c = s;
+    //until EOF, send string elements to LCD_data
+    while (*c != 0)
+    {
+        dataWrite(*c);
+        c++;
+    }
+}
+
