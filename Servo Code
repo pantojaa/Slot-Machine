@@ -1,0 +1,48 @@
+#include "msp.h"
+#include <stdio.h>
+#include <TimerA_init.h>
+#include <SysTick.h>
+
+#define SERVO_PORT P2
+#define SERVO_PIN BIT4
+
+#define TIMER_A_CCTLN_OUTPUT_7 BIT3
+#define TIMER_A_CTL_SSEL_SMCLK BIT9
+#define TIMER_A_CTL_MC_UP BIT4
+
+void setServoPos(int onTime);
+
+void setupSERVO();
+
+int main(void)
+{
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // Stop watchdog timer
+    setupSERVO();
+    SysTick_init_NoInt();
+
+    while (1)
+    {
+        setServoPos(6000);
+           delay_ms(1000);
+           setServoPos(3000);
+           delay_ms(1000);
+    }
+}
+
+void setupSERVO()
+{
+    SERVO_PORT->SEL0 |= (SERVO_PIN ); //GPIO
+    P2->SEL1 &= ~(SERVO_PIN );
+    P2->DIR |= (SERVO_PIN ); //OUTPUT
+}
+
+void setServoPos(int onTime)
+{
+    TIMER_A0->CTL = (TIMER_A_CTL_SSEL_SMCLK | TIMER_A_CTL_MC_UP
+            | TIMER_A_CTL_CLR);
+    TIMER_A0->CCR[0] = 60000;
+    TIMER_A0->CCTL[1] = TIMER_A_CCTLN_OUTMOD_7;
+    TIMER_A0->CCR[1] = onTime;
+
+}
+
